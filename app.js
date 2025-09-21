@@ -4,6 +4,7 @@ import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 import authRoutes from "./routes/authRoutes.js";
+import articleRoutes from "./routes/articleRoutes.js";
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.get("/", (req, res) => {
 
 // Import routes
 app.use("/api/auth", authRoutes);
+app.use("/api/articles", articleRoutes);
 
 // Start server
 app.listen(process.env.PORT || 3000, () => {
