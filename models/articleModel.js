@@ -17,7 +17,7 @@ export const getAllArticles = async () => {
 
 export const getArticleById = async (id) => {
   const [rows] = await db.query(`SELECT * FROM articles WHERE id = ?`, [id]);
-  return rows;
+  return rows.length > 0 ? rows[0] : null;
 };
 
 export const updateArticle = async (id, title, content, image, status) => {

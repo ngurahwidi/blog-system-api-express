@@ -5,8 +5,14 @@ import {
   getArticleById,
   updateArticle,
 } from "../models/articleModel.js";
+import { articleFormSchema } from "../validation/article/articleValidation.js";
 
 export const create = async (req, res) => {
+  const { error } = articleFormSchema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ error: error.message });
+  }
+
   const { title, content, status } = req.body;
   const image = req.file ? req.file.filename : null;
 
@@ -55,11 +61,12 @@ export const getAll = async (req, res) => {
 
 export const getOne = async (req, res) => {
   try {
+    console.log(req.params.id);
     const article = await getArticleById(req.params.id);
     if (!article) {
-      return res.status(200).json({
-        status: "Succes",
-        code: 200,
+      return res.status(404).json({
+        status: "Error",
+        code: 404,
         message: "Article not found",
         data: [],
       });
@@ -82,6 +89,11 @@ export const getOne = async (req, res) => {
 };
 
 export const update = async (req, res) => {
+  const { error } = articleFormSchema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ error: error.message });
+  }
+
   const { title, content, status } = req.body;
   const image = req.file ? req.file.filename : null;
 
@@ -93,11 +105,23 @@ export const update = async (req, res) => {
       image,
       status
     );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: "Error",
+        code: 404,
+        message: "Article not found",
+        data: [],
+      });
+    }
+
+    const updatedArticle = await getArticleById(req.params.id);
+
     res.status(200).json({
       status: "Success",
       code: 200,
       message: "Success update article",
-      data: result,
+      data: updatedArticle,
     });
   } catch (err) {
     res.status(500).json({
@@ -111,7 +135,17 @@ export const update = async (req, res) => {
 
 export const remove = async (req, res) => {
   try {
-    await deleteArticle(req.params.id);
+    const result = await deleteArticle(req.params.id);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: "Error",
+        code: 404,
+        message: "Article not found",
+        data: [],
+      });
+    }
+
     res.status(200).json({
       status: "Success",
       code: 200,
