@@ -25,7 +25,9 @@ export const updateArticle = async (id, title, content, image, status) => {
     `UPDATE articles SET title = ?, content = ?, image = ?, status = ? WHERE id = ?`,
     [title, content, image, status, id]
   );
-  return result;
+  // return result;
+  const [rows] = await db.query(`SELECT * FROM articles WHERE id = ?`, [id]);
+  return rows[0];
 };
 
 export const deleteArticle = async (id) => {

@@ -98,15 +98,9 @@ export const update = async (req, res) => {
   const image = req.file ? req.file.filename : null;
 
   try {
-    const result = await updateArticle(
-      req.params.id,
-      title,
-      content,
-      image,
-      status
-    );
+    const article = await getArticleById(req.params.id);
 
-    if (result.affectedRows === 0) {
+    if (!article) {
       return res.status(404).json({
         status: "Error",
         code: 404,
@@ -115,7 +109,21 @@ export const update = async (req, res) => {
       });
     }
 
-    const updatedArticle = await getArticleById(req.params.id);
+    if (article.user_id !== req.user.id) {
+      return res.status(403).json({
+        status: "Error",
+        code: 403,
+        message: "You are not allowed to update this article",
+        data: [],
+      });
+    }
+    const updatedArticle = await updateArticle(
+      req.params.id,
+      title,
+      content,
+      image,
+      status
+    );
 
     res.status(200).json({
       status: "Success",
@@ -135,9 +143,8 @@ export const update = async (req, res) => {
 
 export const remove = async (req, res) => {
   try {
-    const result = await deleteArticle(req.params.id);
-
-    if (result.affectedRows === 0) {
+    const article = await getArticleById(req.params.id);
+    if (!article) {
       return res.status(404).json({
         status: "Error",
         code: 404,
@@ -145,6 +152,17 @@ export const remove = async (req, res) => {
         data: [],
       });
     }
+
+    if (article.user_id !== req.user.id) {
+      return res.status(403).json({
+        status: "Error",
+        code: 403,
+        message: "You are not allowed to delete this article",
+        data: [],
+      });
+    }
+
+    await deleteArticle(req.params.id);
 
     res.status(200).json({
       status: "Success",
