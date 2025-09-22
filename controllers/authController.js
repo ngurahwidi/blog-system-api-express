@@ -1,19 +1,10 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import joi from "joi";
 import { findUserByEmail, createUser } from "../models/userModel.js";
-
-// Form validation schemas
-const registerSchema = joi.object({
-  name: joi.string().required(),
-  email: joi.string().email().required(),
-  password: joi.string().min(6).required(),
-});
-
-const loginSchema = joi.object({
-  email: joi.string().email().required(),
-  password: joi.string().required(),
-});
+import {
+  loginSchema,
+  registerSchema,
+} from "../validation/auth/authValidation.js";
 
 // Register a new user
 export const register = async (req, res) => {
