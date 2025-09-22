@@ -95,7 +95,6 @@ export const update = async (req, res) => {
   }
 
   const { title, content, status } = req.body;
-  const image = req.file ? req.file.filename : null;
 
   try {
     const article = await getArticleById(req.params.id);
@@ -117,6 +116,9 @@ export const update = async (req, res) => {
         data: [],
       });
     }
+
+    const image = req.file ? req.file.filename : article.image;
+
     const updatedArticle = await updateArticle(
       req.params.id,
       title,
